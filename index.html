@@ -1,79 +1,1158 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>智享宿舍 - 资源共享与创新协作平台</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: '#32c260',
-              secondary: '#F97316',
-              neutral: '#F3F4F6',
-              dark: '#1F2937',
-              warning: '#FBBF24',
-              danger: '#EF4444'
-            },
-            fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.3s ease-out',
-              'slide-up': 'slideUp 0.4s ease-out',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              },
-              slideUp: {
-                '0%': { transform: 'translateY(20px)', opacity: '0' },
-                '100%': { transform: 'translateY(0)', opacity: '1' },
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>楼栋共享 - 寝室物品共享管理系统</title>
+  <!-- 引入外部资源 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- 配置Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#32c260', // 主色调：绿色
+            secondary: '#F97316', // 强调色：橙色
+            neutral: '#F3F4F6', // 中性色：浅灰
+            dark: '#1F2937', // 深色文本
+            warning: '#FBBF24', // 警告色：黄色
+            danger: '#EF4444'   // 危险色：红色
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-sans text-dark">
+  <!-- 导航栏 -->
+  <header id="navbar" class="fixed w-full bg-white/90 backdrop-blur-sm z-50 transition-all duration-300 shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-share-alt text-primary text-2xl"></i>
+        <h1 class="text-xl font-bold text-primary">楼栋共享</h1>
+      </div>
+      
+      <!-- 桌面端导航 - 新增信用中心 -->
+      <nav class="hidden md:flex items-center space-x-8">
+        <a href="#home" class="font-medium hover:text-primary transition-colors">首页</a>
+        <a href="#items" class="font-medium hover:text-primary transition-colors">物品列表</a>
+        <a href="#share" class="font-medium hover:text-primary transition-colors">我要共享</a>
+        <a href="#rank" class="font-medium hover:text-primary transition-colors">物品需求</a>
+        <a href="#record" class="font-medium hover:text-primary transition-colors">借用记录</a>
+        <a href="#credit" class="font-medium hover:text-primary transition-colors">信用中心</a>
+      </nav>
+      
+      <div class="flex items-center space-x-4">
+      
+        <button class="hidden md:block px-4 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">
+          登录
+        </button>
+        <!-- 移动端菜单按钮 -->
+        <button id="menuBtn" class="md:hidden text-dark text-xl">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobileMenu" class="md:hidden hidden bg-white border-t">
+      <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+        <a href="#home" class="py-2 font-medium hover:text-primary transition-colors">首页</a>
+        <a href="#items" class="py-2 font-medium hover:text-primary transition-colors">物品列表</a>
+        <a href="#share" class="py-2 font-medium hover:text-primary transition-colors">我要共享</a>
+        <a href="#rank" class="py-2 font-medium hover:text-primary transition-colors">物品需求</a>
+        <a href="#record" class="py-2 font-medium hover:text-primary transition-colors">借用记录</a>
+        <a href="#credit" class="py-2 font-medium hover:text-primary transition-colors">信用中心</a>
+     
+        <button class="w-full px-4 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">
+          <a href="登录.html"></a>登录
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- 首页banner -->
+    <section id="home" class="pt-24 pb-16 md:pt-32 md:pb-24 bg-gradient-to-br from-blue-50 to-indigo-50">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 mb-10 md:mb-0">
+            <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight mb-4">
+              让闲置物品<br>
+              <span class="text-primary">流动起来</span>
+            </h2>
+            <p class="text-gray-600 text-lg mb-8 max-w-lg">
+              楼栋级寝室共享管理系统，轻松实现物品登记、借用、归还全流程，无需实体柜，让资源利用更高效。
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <button class="px-6 py-3 rounded-full bg-primary text-white font-medium hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl">
+                开始使用
+              </button>
+              <button class="px-6 py-3 rounded-full bg-white text-primary border border-primary font-medium hover:bg-gray-50 transition-all">
+                <i class="fa fa-play-circle mr-2"></i>观看教程
+              </button>
+            </div>
+            <div class="mt-8 flex items-center text-gray-500">
+              <div class="flex -space-x-2">
+                <img src="https://picsum.photos/200/200?random=1" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                <img src="https://picsum.photos/200/200?random=2" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                <img src="https://picsum.photos/200/200?random=3" alt="用户头像" class="w-8 h-8 rounded-full border-2 border-white">
+                <div class="w-8 h-8 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-xs font-medium">
+                  +348
+                </div>
+              </div>
+              <p class="ml-3 text-sm">已有351位同学加入共享</p>
+            </div>
+          </div>
+          <div class="md:w-1/2 relative">
+            <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl hover-lift">
+              <img src="img/共享.png" alt="系统展示" class="w-full">
+            </div>
+            <div class="absolute top-1/4 -right-4 w-32 h-32 bg-secondary/20 rounded-full blur-2xl"></div>
+            <div class="absolute bottom-1/4 -left-6 w-40 h-40 bg-primary/20 rounded-full blur-2xl"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 功能特点 -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">简单三步，轻松共享</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">无需复杂操作，只需简单几步，即可完成物品共享与借用全流程</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- 步骤1 -->
+          <div class="bg-neutral rounded-xl p-6 text-center hover-lift card-shadow">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i class="fa fa-plus text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3">1. 登记物品</h3>
+            <p class="text-gray-600">
+              输入物品名称、所在寝室、可借时间段等信息，一键完成共享登记
+            </p>
+          </div>
+          
+          <!-- 步骤2 -->
+          <div class="bg-neutral rounded-xl p-6 text-center hover-lift card-shadow">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i class="fa fa-calendar-check-o text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3">2. 预约借用</h3>
+            <p class="text-gray-600">
+              浏览楼栋物品清单，选择所需物品并预约使用时间，系统自动锁定
+            </p>
+          </div>
+          
+          <!-- 步骤3 -->
+          <div class="bg-neutral rounded-xl p-6 text-center hover-lift card-shadow">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i class="fa fa-exchange text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3">3. 取还登记</h3>
+            <p class="text-gray-600">
+              取件后标记"已借用"，归还时标记"已归还"，系统自动记录并计算积分
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 物品列表 -->
+    <section id="items" class="py-16 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+          <div>
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-3">可借物品列表</h2>
+            <p class="text-gray-600">浏览本楼栋可共享的物品，找到你需要的资源</p>
+          </div>
+          
+          <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
+            <div class="relative">
+              <input type="text" placeholder="搜索物品..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 w-full sm:w-64">
+              <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+            
+            <select class="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white">
+              <option>全部分类</option>
+              <option>工具类</option>
+              <option>电器类</option>
+              <option>生活用品</option>
+              <option>学习资料</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- 物品卡片网格 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <!-- 物品1 -->
+          <div class="bg-white rounded-xl overflow-hidden hover-lift card-shadow">
+            <div class="h-64 overflow-hidden">
+              <img src="img/晾衣架.jpg" alt="晾衣架" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+            </div>
+            <div class="p-5">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="font-bold text-lg">晾衣架</h3>
+                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">可借用</span>
+              </div>
+              <div class="flex justify-between items-center mb-3">
+                <p class="text-gray-500 text-sm">桔园</p>
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">九成新</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-600 mb-4">
+                <i class="fa fa-clock-o mr-1"></i>
+                <span>可借时段: 18:00-22:00</span>
+              </div>
+              <button class="w-full py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
+                立即预约
+              </button>
+            </div>
+          </div>
+          
+          <!-- 物品2 -->
+          <div class="bg-white rounded-xl overflow-hidden hover-lift card-shadow">
+            <div class="h-64 overflow-hidden">
+              <img src="img/螺丝刀.jpg" alt="螺丝刀套装" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+            </div>
+            <div class="p-5">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="font-bold text-lg">螺丝刀套装</h3>
+                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">可借用</span>
+              </div>
+              <div class="flex justify-between items-center mb-3">
+                <p class="text-gray-500 text-sm">桔园</p>
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">全新</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-600 mb-4">
+                <i class="fa fa-clock-o mr-1"></i>
+                <span>可借时段: 全天</span>
+              </div>
+              <button class="w-full py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
+                立即预约
+              </button>
+            </div>
+          </div>
+          
+          <!-- 物品3 - 补充完整信息 -->
+          <div class="bg-white rounded-xl overflow-hidden hover-lift card-shadow">
+            <div class="h-64 overflow-hidden">
+              <img src="img/高等数学.jpg" alt="高数书" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+            </div>
+            <div class="p-5">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="font-bold text-lg">高等数学</h3>
+                <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">已预约</span>
+              </div>
+              <div class="flex justify-between items-center mb-3">
+                <p class="text-gray-500 text-sm">楠园</p>
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">八成新</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-600 mb-4">
+                <i class="fa fa-clock-o mr-1"></i>
+                <span>可借时段: 周末</span>
+              </div>
+              <div class="text-xs text-gray-500 mb-4">
+                <p>备注: 上册，附带笔记，请勿勾画</p>
+              </div>
+              <button class="w-full py-2 rounded-lg bg-gray-200 text-gray-500 cursor-not-allowed">
+                查看可借时间
+              </button>
+            </div>
+          </div>
+          
+          <!-- 物品4 -->
+          <div class="bg-white rounded-xl overflow-hidden hover-lift card-shadow">
+            <div class="h-64 overflow-hidden">
+              <img src="img/自拍杆.jpg" alt="自拍杆" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+            </div>
+            <div class="p-5">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="font-bold text-lg">自拍杆</h3>
+                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">可借用</span>
+              </div>
+              <div class="flex justify-between items-center mb-3">
+                <p class="text-gray-500 text-sm">竹园</p>
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">七成新</span>
+              </div>
+              <div class="flex items-center text-sm text-gray-600 mb-4">
+                <i class="fa fa-clock-o mr-1"></i>
+                <span>可借时段: 17:00-21:00</span>
+              </div>
+              <button class="w-full py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
+                立即预约
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="text-center mt-10">
+          <button class="px-6 py-3 rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors">
+            加载更多 <i class="fa fa-angle-down ml-1"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 我要共享 -->
+    <section id="share" class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col lg:flex-row gap-12 items-center">
+          <div class="lg:w-1/2">
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">分享你的闲置物品</h2>
+            <p class="text-gray-600 mb-6">
+              将你暂时不用的物品共享给楼栋同学，既能帮助他人，又能获得信用积分，何乐而不为？
+            </p>
+            
+            <div class="space-y-4 mb-8">
+              <div class="flex items-start">
+                <div class="mt-1 mr-4 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <i class="fa fa-check text-primary text-sm"></i>
+                </div>
+                <p class="text-gray-600">每共享一件物品可获得10积分奖励</p>
+              </div>
+              <div class="flex items-start">
+                <div class="mt-1 mr-4 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <i class="fa fa-check text-primary text-sm"></i>
+                </div>
+                <p class="text-gray-600">物品被借用一次可额外获得5积分</p>
+              </div>
+              <div class="flex items-start">
+                <div class="mt-1 mr-4 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <i class="fa fa-check text-primary text-sm"></i>
+                </div>
+                <p class="text-gray-600">积分可兑换公共物品使用优先权或小礼品</p>
+              </div>
+            </div>
+            
+            <!-- 积分兑换规则卡片 -->
+            <div class="bg-neutral p-5 rounded-xl mb-6">
+              <h4 class="font-bold mb-3 flex items-center">
+                <i class="fa fa-trophy text-secondary mr-2"></i>积分兑换规则
+              </h4>
+              <ul class="space-y-2 text-sm text-gray-600">
+                <li class="flex justify-between">
+                  <span>50积分 → 公共物品优先使用权</span>
+                  <span class="text-primary">立即兑换</span>
+                </li>
+                <li class="flex justify-between">
+                  <span>100积分 → 校园超市5元优惠券</span>
+                  <span class="text-primary">立即兑换</span>
+                </li>
+                <li class="flex justify-between">
+                  <span>200积分 → 图书馆储物柜一周使用权</span>
+                  <span class="text-primary">立即兑换</span>
+                </li>
+                <li class="flex justify-between">
+                  <span>500积分 → 洗衣机免费洗衣一次</span>
+                  <span class="text-primary">立即兑换</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div class="bg-neutral p-5 rounded-xl">
+              <div class="flex items-center mb-3">
+                <img src="https://picsum.photos/200/200?random=5" alt="用户头像" class="w-10 h-10 rounded-full mr-3">
+                <div>
+                  <h4 class="font-medium">李明 · 桂园</h4>
+                  <p class="text-sm text-gray-500">已共享12件物品 | 信用分850</p>
+                </div>
+              </div>
+              <p class="text-gray-600 text-sm italic">
+                "在这个平台共享了好几个物品，帮助了不少的同学，获得了不少积分，上个月用积分兑换了洗衣券，很实用！"
+              </p>
+            </div>
+          </div>
+          
+          <div class="lg:w-1/2 w-full">
+            <div class="bg-neutral rounded-2xl p-6 md:p-8 card-shadow">
+              <h3 class="text-xl font-bold mb-6">物品共享登记</h3>
+              
+              <form class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">物品名称</label>
+                  <input type="text" placeholder="例如：吹风机、螺丝刀..." class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">物品分类</label>
+                  <select class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <option>请选择分类</option>
+                    <option>工具类</option>
+                    <option>电器类</option>
+                    <option>生活用品</option>
+                    <option>学习资料</option>
+                    <option>其他</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">物品新旧程度</label>
+                  <select class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <option>全新</option>
+                    <option>九成新</option>
+                    <option>八成新</option>
+                    <option>七成新</option>
+                    <option>六成新及以下</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">所在寝室</label>
+                  <div class="grid grid-cols-2 gap-4">
+                    <select class="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                      <option>桔园</option>
+                      <option>桃园</option>
+                      <option>梅园</option>
+                      <option>竹园</option>
+                      <option>桂园</option>
+                      <option>楠园</option>
+                      <option>龙翔园</option>
+                    </select>
+                    <input type="text" placeholder="寝室号" class="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">可借时间段</label>
+                  <input type="text" placeholder="例如：全天、18:00-22:00..." class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">物品描述（可选）</label>
+                  <textarea rows="3" placeholder="简单描述物品状态、使用注意事项等..." class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50"></textarea>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">上传物品图片（可选）</label>
+                  <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
+                    <i class="fa fa-cloud-upload text-2xl text-gray-400 mb-2"></i>
+                    <p class="text-gray-500">点击或拖拽文件到此处上传</p>
+                    <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，不超过5MB</p>
+                  </div>
+                </div>
+                
+                <button type="submit" class="w-full py-3 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition-colors">
+                  确认共享
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 物品需求与交流 -->
+    <section id="rank" class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">物品需求与交流</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">发布你需要的物品，寻找共享资源，与楼栋同学交流互助</p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- 发帖区和帖子列表 -->
+          <div class="lg:col-span-2 bg-neutral rounded-2xl p-6 card-shadow">
+            <!-- 发布新帖 -->
+            <div class="bg-white rounded-xl p-4 mb-6">
+              <h3 class="text-xl font-bold mb-4">发布物品需求</h3>
+              <form class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">物品名称</label>
+                  <input type="text" placeholder="例如：笔记本支架、万用表..." class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">需求描述</label>
+                  <textarea rows="3" placeholder="请描述你需要这件物品的用途、使用时间等信息..." class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50"></textarea>
+                </div>
+                
+                <div class="flex justify-end">
+                  <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
+                    发布需求
+                  </button>
+                </div>
+              </form>
+            </div>
+            
+            <!-- 帖子列表 -->
+            <h3 class="text-xl font-bold mb-4">最新需求</h3>
+            <div class="space-y-4">
+              <!-- 帖子1 -->
+              <div class="bg-white rounded-xl p-4 hover-lift">
+                <div class="flex items-start">
+                  <img src="https://picsum.photos/200/200?random=50" alt="用户头像" class="w-10 h-10 rounded-full mr-3">
+                  <div class="flex-grow">
+                    <div class="flex justify-between">
+                      <h4 class="font-medium">张小强</h4>
+                      <span class="text-xs text-gray-500">2小时前</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2">桂园</p>
+                    <h5 class="font-semibold mb-1">求借笔记本支架</h5>
+                    <p class="text-gray-600 text-sm mb-3">临时需要用一下笔记本支架，晚上写论文用，大概用3小时，有同学愿意借用吗？</p>
+                    <div class="flex items-center text-sm">
+                      <button class="flex items-center text-gray-500 hover:text-primary mr-4">
+                        <i class="fa fa-comment-o mr-1"></i> 3条回复
+                      </button>
+                      <button class="flex items-center text-gray-500 hover:text-primary">
+                        <i class="fa fa-thumbs-o-up mr-1"></i> 帮助他
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 帖子2 -->
+              <div class="bg-white rounded-xl p-4 hover-lift">
+                <div class="flex items-start">
+                  <img src="https://picsum.photos/200/200?random=51" alt="用户头像" class="w-10 h-10 rounded-full mr-3">
+                  <div class="flex-grow">
+                    <div class="flex justify-between">
+                      <h4 class="font-medium">王丽丽</h4>
+                      <span class="text-xs text-gray-500">昨天 18:30</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2">竹园</p>
+                    <h5 class="font-semibold mb-1">请问有人有闲置的瑜伽球吗？</h5>
+                    <p class="text-gray-600 text-sm mb-3">想借瑜伽球练习几天，下周有个体测项目需要，大概借用5天左右，会小心使用的！</p>
+                    <div class="flex items-center text-sm">
+                      <button class="flex items-center text-gray-500 hover:text-primary mr-4">
+                        <i class="fa fa-comment-o mr-1"></i> 5条回复
+                      </button>
+                      <button class="flex items-center text-gray-500 hover:text-primary">
+                        <i class="fa fa-thumbs-o-up mr-1"></i> 帮助她
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 帖子3 -->
+              <div class="bg-white rounded-xl p-4 hover-lift">
+                <div class="flex items-start">
+                  <img src="https://picsum.photos/200/200?random=52" alt="用户头像" class="w-10 h-10 rounded-full mr-3">
+                  <div class="flex-grow">
+                    <div class="flex justify-between">
+                      <h4 class="font-medium">刘明</h4>
+                      <span class="text-xs text-gray-500">2天前</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2">龙翔园</p>
+                    <h5 class="font-semibold mb-1">求借一套油画棒</h5>
+                    <p class="text-gray-600 text-sm mb-3">周末想学一下油画棒，需要一套基础油画棒工具，有同学能共享吗？有偿</p>
+                    <div class="flex items-center text-sm">
+                      <button class="flex items-center text-gray-500 hover:text-primary mr-4">
+                        <i class="fa fa-comment-o mr-1"></i> 8条回复
+                      </button>
+                      <button class="flex items-center text-gray-500 hover:text-primary">
+                        <i class="fa fa-thumbs-o-up mr-1"></i> 帮助他
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="text-center mt-6">
+              <button class="px-4 py-2 text-primary hover:text-primary/80">
+                查看更多需求 <i class="fa fa-angle-right ml-1"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- 数据统计 -->
+          <div class="bg-neutral rounded-2xl p-6 card-shadow">
+            <h3 class="text-xl font-bold mb-6">共享数据统计</h3>
+            
+            <!-- 图表容器 -->
+            <div class="bg-white rounded-xl p-4 mb-6">
+              <h4 class="text-sm font-medium mb-4">物品分类占比</h4>
+              <div class="h-64">
+                <canvas id="categoryChart"></canvas>
+              </div>
+            </div>
+            
+            <!-- 数据卡片 -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div class="bg-white rounded-xl p-4 text-center">
+                <p class="text-sm text-gray-500 mb-1">总共享物品</p>
+                <p class="text-2xl font-bold text-primary">256</p>
+              </div>
+              <div class="bg-white rounded-xl p-4 text-center">
+                <p class="text-sm text-gray-500 mb-1">本月借用</p>
+                <p class="text-2xl font-bold text-primary">132</p>
+              </div>
+              <div class="bg-white rounded-xl p-4 text-center">
+                <p class="text-sm text-gray-500 mb-1">活跃用户</p>
+                <p class="text-2xl font-bold text-primary">89</p>
+              </div>
+              <div class="bg-white rounded-xl p-4 text-center">
+                <p class="text-sm text-gray-500 mb-1">平均满意度</p>
+                <p class="text-2xl font-bold text-primary">4.8</p>
+              </div>
+            </div>
+            
+            <!-- 试点数据 -->
+            <div class="bg-white rounded-xl p-4 mb-6">
+              <h4 class="text-sm font-medium mb-3">试点运营数据</h4>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">楼栋注册率</span>
+                  <span class="font-medium">78%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">月均借用次数</span>
+                  <span class="font-medium">215次</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">物品损坏率</span>
+                  <span class="font-medium">1.2%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">平均归还及时率</span>
+                  <span class="font-medium">96%</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 热门物品 -->
+            <div>
+              <h4 class="text-sm font-medium mb-4">热门物品TOP3</h4>
+              <div class="space-y-3">
+                <div class="bg-white rounded-xl p-3 flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm mr-3">1</div>
+                  <span class="flex-grow">充电宝</span>
+                  <span class="text-sm text-gray-500">32次/月</span>
+                </div>
+                <div class="bg-white rounded-xl p-3 flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm mr-3">2</div>
+                  <span class="flex-grow">吹风机</span>
+                  <span class="text-sm text-gray-500">28次/月</span>
+                </div>
+                <div class="bg-white rounded-xl p-3 flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm mr-3">3</div>
+                  <span class="flex-grow">螺丝刀套装</span>
+                  <span class="text-sm text-gray-500">21次/月</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 借用记录管理 -->
+    <section id="record" class="py-16 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">借用记录管理</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">随时查看你的借用和被借用记录，掌握物品动态</p>
+        </div>
+        
+        <div class="bg-white rounded-2xl overflow-hidden card-shadow">
+          <div class="border-b">
+            <div class="flex">
+              <button class="px-6 py-4 font-medium text-primary border-b-2 border-primary">我的借用</button>
+              <button class="px-6 py-4 font-medium text-gray-500 hover:text-gray-700">我的共享</button>
+            </div>
+          </div>
+          
+          <div class="p-6">
+            <!-- 到期提醒 -->
+            <div class="bg-warning/10 border-l-4 border-warning p-4 mb-6 rounded">
+              <div class="flex items-start">
+                <i class="fa fa-exclamation-triangle text-warning mt-0.5 mr-3"></i>
+                <div>
+                  <h4 class="font-medium text-warning">有1件物品即将到期</h4>
+                  <p class="text-sm text-gray-600">螺丝刀套装 将于今天18:30到期，请及时归还</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b">
+                    <th class="text-left py-4 px-4 font-medium text-gray-500">物品名称</th>
+                    <th class="text-left py-4 px-4 font-medium text-gray-500">所在寝室</th>
+                    <th class="text-left py-4 px-4 font-medium text-gray-500">借用时间</th>
+                    <th class="text-left py-4 px-4 font-medium text-gray-500">预计归还</th>
+                    <th class="text-left py-4 px-4 font-medium text-gray-500">状态</th>
+                    <th class="text-left py-4 px-4 font-medium text-gray-500">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-4 px-4">
+                      <div class="flex items-center">
+                        <img src="img/螺丝刀.jpg" alt="螺丝刀套装" class="w-10 h-10 rounded mr-3">
+                        <span>螺丝刀套装</span>
+                      </div>
+                    </td>
+                    <td class="py-4 px-4">桂园501</td>
+                    <td class="py-4 px-4">2023-05-10 14:30</td>
+                    <td class="py-4 px-4">
+                      <span class="text-warning font-medium">2023-05-10 18:30</span>
+                    </td>
+                    <td class="py-4 px-4">
+                      <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">使用中</span>
+                    </td>
+                    <td class="py-4 px-4">
+                      <div class="flex space-x-2">
+                        <button class="text-primary hover:text-primary/80">
+                          我已归还
+                        </button>
+                        <button class="text-danger hover:text-danger/80">
+                          物品损坏
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-4 px-4">
+                      <div class="flex items-center">
+                        <img src="img/充电宝.jpg" alt="充电宝" class="w-10 h-10 rounded mr-3">
+                        <span>充电宝</span>
+                      </div>
+                    </td>
+                    <td class="py-4 px-4">楠园301</td>
+                    <td class="py-4 px-4">2023-05-08 20:15</td>
+                    <td class="py-4 px-4">2023-05-09 08:15</td>
+                    <td class="py-4 px-4">
+                      <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">已归还</span>
+                    </td>
+                    <td class="py-4 px-4">
+                      <button class="text-gray-400 cursor-default">
+                        已完成
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-4 px-4">
+                      <div class="flex items-center">
+                        <img src="img/三脚架.jpg" alt="相机三脚架" class="w-10 h-10 rounded mr-3">
+                        <span>相机三脚架</span>
+                      </div>
+                    </td>
+                    <td class="py-4 px-4">桃园207</td>
+                    <td class="py-4 px-4">2023-05-05 10:00</td>
+                    <td class="py-4 px-4">2023-05-05 16:00</td>
+                    <td class="py-4 px-4">
+                      <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">已归还</span>
+                    </td>
+                    <td class="py-4 px-4">
+                      <button class="text-gray-400 cursor-default">
+                        已完成
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50">
+                    <td class="py-4 px-4">
+                      <div class="flex items-center">
+                        <img src="img/高等数学.jpg" alt="高等数学教材" class="w-10 h-10 rounded mr-3">
+                        <span>高等数学教材</span>
+                      </div>
+                    </td>
+                    <td class="py-4 px-4">楠园402</td>
+                    <td class="py-4 px-4">2023-05-01 09:00</td>
+                    <td class="py-4 px-4">2023-05-03 18:00</td>
+                    <td class="py-4 px-4">
+                      <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">已逾期</span>
+                    </td>
+                    <td class="py-4 px-4">
+                      <div class="flex space-x-2">
+                        <button class="text-primary hover:text-primary/80">
+                          我已归还
+                        </button>
+                        <button class="text-gray-600 text-sm">
+                          <i class="fa fa-info-circle mr-1"></i> 扣10分
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="mt-6 flex justify-between items-center">
+              <p class="text-sm text-gray-500">显示 1-4 条，共 8 条记录</p>
+              <div class="flex space-x-1">
+                <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-400 hover:border-primary hover:text-primary">
+                  <i class="fa fa-angle-left"></i>
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center rounded bg-primary text-white">1</button>
+                <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">2</button>
+                <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">3</button>
+                <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">
+                  <i class="fa fa-angle-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 信用中心 - 新增信任保障相关功能 -->
+    <section id="credit" class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">信用与保障中心</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">我们建立了完善的信用体系和保障机制，让共享更安心</p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- 信用分与记录 -->
+          <div class="bg-neutral rounded-2xl p-6 card-shadow">
+            <h3 class="text-xl font-bold mb-6">我的信用</h3>
+            
+            <div class="bg-white rounded-xl p-6 mb-6 text-center">
+              <div class="relative inline-block">
+                <div class="w-40 h-40 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <span class="text-4xl font-bold text-primary">780</span>
+                </div>
+                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-primary text-white text-xs px-3 py-1 rounded-full">
+                  优秀
+                </div>
+              </div>
+              <p class="text-gray-600 mb-4">信用分越高，可借物品种类越多，借用时长越长</p>
+              <button class="px-4 py-2 rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors">
+                查看信用规则
+              </button>
+            </div>
+            
+            <h4 class="font-bold mb-4">信用记录</h4>
+            <div class="space-y-4">
+              <div class="bg-white rounded-xl p-4 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-4 flex-shrink-0">
+                  <i class="fa fa-plus text-green-600"></i>
+                </div>
+                <div class="flex-grow">
+                  <p class="font-medium">按时归还充电宝</p>
+                  <p class="text-sm text-gray-500">2023-05-09 +5分</p>
+                </div>
+              </div>
+              
+              <div class="bg-white rounded-xl p-4 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-4 flex-shrink-0">
+                  <i class="fa fa-minus text-red-600"></i>
+                </div>
+                <div class="flex-grow">
+                  <p class="font-medium">高等数学教材逾期归还</p>
+                  <p class="text-sm text-gray-500">2023-05-04 -10分</p>
+                </div>
+              </div>
+              
+              <div class="bg-white rounded-xl p-4 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-4 flex-shrink-0">
+                  <i class="fa fa-plus text-green-600"></i>
+                </div>
+                <div class="flex-grow">
+                  <p class="font-medium">新共享物品：篮球</p>
+                  <p class="text-sm text-gray-500">2023-05-01 +10分</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 信任保障功能 -->
+          <div class="bg-neutral rounded-2xl p-6 card-shadow">
+            <h3 class="text-xl font-bold mb-6">信任保障</h3>
+            
+            <div class="space-y-6">
+              <!-- 物品损坏上报 -->
+              <div class="bg-white rounded-xl p-5 hover-lift">
+                <div class="flex">
+                  <div class="w-12 h-12 rounded-full bg-danger/10 flex items-center justify-center mr-4 flex-shrink-0">
+                    <i class="fa fa-exclamation-circle text-danger text-xl"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold mb-2">物品损坏/丢失上报</h4>
+                    <p class="text-gray-600 text-sm mb-3">如借用物品发生损坏或丢失，请及时上报，系统将协助双方协商解决</p>
+                    <button class="text-primary hover:text-primary/80 text-sm font-medium">
+                      立即上报 <i class="fa fa-arrow-right ml-1"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 纠纷处理 -->
+              <div class="bg-white rounded-xl p-5 hover-lift">
+                <div class="flex">
+                  <div class="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center mr-4 flex-shrink-0">
+                    <i class="fa fa-gavel text-warning text-xl"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold mb-2">共享纠纷处理</h4>
+                    <p class="text-gray-600 text-sm mb-3">如在共享过程中产生纠纷，可申请管理员介入调解，保障双方权益</p>
+                    <button class="text-primary hover:text-primary/80 text-sm font-medium">
+                      申请调解 <i class="fa fa-arrow-right ml-1"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 物品价值评估 -->
+              <div class="bg-white rounded-xl p-5 hover-lift">
+                <div class="flex">
+                  <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-4 flex-shrink-0">
+                    <i class="fa fa-balance-scale text-primary text-xl"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold mb-2">物品价值评估</h4>
+                    <p class="text-gray-600 text-sm mb-3">贵重物品可申请价值评估，作为损坏赔偿的参考标准</p>
+                    <button class="text-primary hover:text-primary/80 text-sm font-medium">
+                      评估物品 <i class="fa fa-arrow-right ml-1"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 保障规则 -->
+              <div class="bg-white rounded-xl p-5">
+                <h4 class="font-bold mb-3">共享保障规则</h4>
+                <ul class="space-y-2 text-sm text-gray-600">
+                  <li class="flex items-start">
+                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                    <span>借用物品时应检查物品状态，确认无误后再确认取用</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                    <span>轻微损耗由物品所有者承担，重大损坏或丢失需按约定赔偿</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                    <span>恶意损坏物品将扣除50-200信用分，情节严重者禁用账号</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                    <span>连续3次逾期未还将限制借用权限7天</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 底部CTA -->
+    <section class="py-16 bg-primary/5">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-6">加入楼栋共享，让资源更高效</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto mb-8">
+          无论是借出还是借入，每一次共享都是一次有意义的互助。立即加入我们，体验共享经济的便利与温暖。
+        </p>
+        <button class="px-8 py-3 rounded-full bg-primary text-white font-medium hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl text-lg">
+          立即开始共享
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- JavaScript -->
+  <script>
+    // 移动端菜单切换
+    document.getElementById('menuBtn').addEventListener('click', function() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.classList.toggle('hidden');
+    });
+    
+    // 导航栏滚动效果
+    window.addEventListener('scroll', function() {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('py-2', 'shadow');
+        navbar.classList.remove('py-3');
+      } else {
+        navbar.classList.add('py-3');
+        navbar.classList.remove('py-2', 'shadow');
+      }
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+          
+          // 关闭移动菜单
+          document.getElementById('mobileMenu').classList.add('hidden');
+        }
+      });
+    });
+    
+    // 初始化图表
+    window.addEventListener('load', function() {
+      const ctx = document.getElementById('categoryChart').getContext('2d');
+      
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['工具类', '电器类', '生活用品', '学习资料', '其他'],
+          datasets: [{
+            data: [35, 25, 20, 15, 5],
+            backgroundColor: [
+              '#3B82F6', // primary
+              '#F97316', // secondary
+              '#10B981', // green
+              '#8B5CF6', // purple
+              '#9CA3AF'  // gray
+            ],
+            borderWidth: 0,
+            cutout: '70%'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+                padding: 15,
+                font: {
+                  size: 11
+                }
               }
             }
-          },
+          }
         }
-      }
-    </script>
-    <style>
-      body {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      /* Custom scrollbar for webkit */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #cbd5e1; 
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8; 
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.10.1",
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "react": "https://aistudiocdn.com/react@^19.2.1",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0"
-  }
-}
+      });
+    });
+  </script>
+<!-- 登录 / 注册 模态框（来自登录.html） -->
+<div id="authModal" class="fixed inset-0 z-[999] hidden">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="modalOverlay"></div>
+
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg px-4">
+    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden relative">
+      <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
+        <i class="fa fa-times text-xl"></i>
+      </button>
+
+      <div class="p-8 md:p-10">
+        <div class="flex border-b mb-8">
+          <button id="loginTab" class="w-1/2 pb-3 font-medium text-center text-primary border-b-2 border-primary">登录</button>
+          <button id="registerTab" class="w-1/2 pb-3 font-medium text-center text-gray-500">注册</button>
+        </div>
+
+        <form id="loginForm" class="space-y-6 block">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">学号</label>
+            <div class="relative">
+              <input type="text" placeholder="请输入学号"
+                     class="w-full px-4 py-3 rounded-lg border pl-10">
+              <i class="fa fa-id-card-o absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+            <div class="relative">
+              <input type="password" placeholder="请输入密码"
+                     class="w-full px-4 py-3 rounded-lg border pl-10">
+              <i class="fa fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+          </div>
+
+          <button type="submit"
+                  class="w-full py-3 rounded-lg bg-primary text-white hover:bg-primary/90 shadow-lg">
+            立即登录
+          </button>
+        </form>
+
+        <form id="registerForm" class="space-y-6 hidden">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">学号</label>
+            <input type="text" placeholder="请输入学号"
+                   class="w-full px-4 py-3 rounded-lg border">
+          </div>
+
+          <button type="submit"
+                  class="w-full py-3 rounded-lg bg-primary text-white hover:bg-primary/90 shadow-lg">
+            注册账号
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const loginBtn = document.querySelector('.login-trigger') || document.querySelector('.open-login') || document.querySelector('.openLogin');
+  const modal = document.getElementById('authModal');
+  const closeBtn = document.getElementById('closeModalBtn');
+  const overlay = document.getElementById('modalOverlay');
+
+  const loginTab = document.getElementById('loginTab');
+  const registerTab = document.getElementById('registerTab');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+
+  // 统一绑定所有登录按钮
+  document.querySelectorAll('button, a').forEach(btn => {
+    if (btn.textContent.includes('登录')) {
+      btn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+      });
+    }
+  });
+
+  // 关闭弹窗
+  closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+  overlay.addEventListener('click', () => modal.classList.add('hidden'));
+
+  // 切换登录/注册
+  loginTab.addEventListener('click', () => {
+    loginForm.classList.remove('hidden');
+    registerForm.classList.add('hidden');
+    loginTab.classList.add('text-primary', 'border-primary');
+    registerTab.classList.remove('text-primary');
+  });
+
+  registerTab.addEventListener('click', () => {
+    registerForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+    registerTab.classList.add('text-primary');
+    loginTab.classList.remove('text-primary', 'border-primary');
+  });
 </script>
-<link rel="stylesheet" href="/index.css">
-</head>
-  <body class="bg-gray-50 text-dark">
-    <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
+
+
 </body>
 </html>
